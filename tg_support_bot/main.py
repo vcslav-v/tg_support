@@ -13,11 +13,7 @@ CONNECTED_TEXT = os.environ.get('CONNECTED_TEXT', '[*{first_name} {last_name}*](
 
 @logger.catch
 async def is_premium(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
-    boosty_group_member = await context.bot.getChatMember(
-        BOOSTY_GROUP_ID,
-        update.effective_message.chat_id,
-    )
-    return boosty_group_member.status is constants.ChatMemberStatus.MEMBER
+    return True
 
 
 @logger.catch
