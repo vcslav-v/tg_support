@@ -1,5 +1,5 @@
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-from telegram import Update, constants
+from telegram import Update
 from loguru import logger
 import os
 
@@ -9,7 +9,6 @@ TELEGRAM_SUPPORT_CHAT_ID = os.environ.get('TELEGRAM_SUPPORT_CHAT_ID', '')
 REPLY_TO_THIS_MESSAGE = os.environ.get('REPLY_TO_THIS_MESSAGE', 'Reply to this message to send it to support chat.')
 WRONG_REPLY = os.environ.get('WRONG_REPLY', 'Wrong reply. Please reply to the message from support chat.')
 CONNECTED_TEXT = os.environ.get('CONNECTED_TEXT', '[*{first_name} {last_name}*](https://t.me/{username}) connected \n ID: `{id}`, lang: {language_code}, premium: {premium}')
-BOOSTY_GROUP_ID = os.environ.get('BOOSTY_GROUP_ID', '')
 
 
 @logger.catch
