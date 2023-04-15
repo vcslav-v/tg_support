@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "tg-support-bot"
+version = "0.1.0"
+description = ""
+authors = ["vaclav-v"]
+readme = "README.md"
+packages = [{include = "tg_support_bot"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+loguru = "^0.7.0"
+python-telegram-bot = {git = "https://github.com/python-telegram-bot/python-telegram-bot.git"}
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+mypy = "^1.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,1 @@
+worker: python -m tg_support_bot.main
