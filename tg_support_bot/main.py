@@ -29,6 +29,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(WELCOME_MESSAGE)
 
     user_info = update.message.from_user.to_dict()
+    if user_info.get('username') is None:
+        user_info['username'] = ''
+    if user_info.get('first_name') is None:
+        user_info['first_name'] = ''
+    if user_info.get('last_name') is None:
+        user_info['last_name'] = ''
+    if user_info.get('language_code') is None:
+        user_info['language_code'] = ''
+
     premium = '✅' if await is_premium(str(update.message.chat_id)) else '❌'
 
     await context.bot.send_message(
