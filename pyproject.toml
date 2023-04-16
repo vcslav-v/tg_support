@@ -9,8 +9,8 @@ packages = [{include = "tg_support_bot"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 loguru = "^0.7.0"
-python-telegram-bot = {git = "https://github.com/python-telegram-bot/python-telegram-bot.git"}
 pydantic = "^1.10.7"
+python-telegram-bot = {git = "https://github.com/python-telegram-bot/python-telegram-bot.git", rev = "master"}
 
 
 [tool.poetry.group.dev.dependencies]
