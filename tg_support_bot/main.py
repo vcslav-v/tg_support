@@ -2,6 +2,8 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from telegram import Update
 from loguru import logger
 import os
+import aiohttp
+from tg_support_bot import schemas
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '')
 WELCOME_MESSAGE = os.environ.get('WELCOME_MESSAGE', 'Welcome to support chat!')
@@ -10,10 +12,17 @@ REPLY_TO_THIS_MESSAGE = os.environ.get('REPLY_TO_THIS_MESSAGE', 'Reply to this m
 WRONG_REPLY = os.environ.get('WRONG_REPLY', 'Wrong reply. Please reply to the message from support chat.')
 CONNECTED_TEXT = os.environ.get('CONNECTED_TEXT', '[*{first_name} {last_name}*](https://t.me/{username}) connected \n ID: `{id}`, lang: {language_code}, premium: {premium}')
 
+BOOSTY_CHECKER_URL = os.environ.get('BOOSTY_CHECKER_URL', '')
+BOOSTY_CHECKER_TOKEN = os.environ.get('BOOSTY_CHECKER_TOKEN', '')
+
 
 @logger.catch
-async def is_premium(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
-    return True
+async def is_premium(ident: str) -> bool:
+    async with aiohttp.ClientSession() as session:
+        session.auth = ('api', BOOSTY_CHECKER_TOKEN)
+        data = schemas.GetPremiumUser(ident=ident)
+        async with session.post('{BOOSTY_CHECKER_URL}/is_premium', data=data.json()) as resp:
+            return schemas.IsPremium.parse_raw(await resp.content()).is_premium
 
 
 @logger.catch
@@ -21,7 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(WELCOME_MESSAGE)
 
     user_info = update.message.from_user.to_dict()
-    premium = '✅' if await is_premium(update, context) else '❌'
+    premium = '✅' if await is_premium(str(update.message.chat_id)) else '❌'
 
     await context.bot.send_message(
         chat_id=TELEGRAM_SUPPORT_CHAT_ID,
