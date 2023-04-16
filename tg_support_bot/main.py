@@ -18,8 +18,7 @@ BOOSTY_CHECKER_TOKEN = os.environ.get('BOOSTY_CHECKER_TOKEN', '')
 
 @logger.catch
 async def is_premium(ident: str) -> bool:
-    async with aiohttp.ClientSession() as session:
-        session.auth = ('api', BOOSTY_CHECKER_TOKEN)
+    async with aiohttp.ClientSession(auth=('api', BOOSTY_CHECKER_TOKEN)) as session:
         data = schemas.GetPremiumUser(ident=ident)
         async with session.post('{BOOSTY_CHECKER_URL}/is_premium', data=data.json()) as resp:
             return schemas.IsPremium.parse_raw(await resp.content()).is_premium
