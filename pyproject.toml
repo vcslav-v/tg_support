@@ -11,6 +11,7 @@ python = "^3.11"
 loguru = "^0.7.0"
 pydantic = "^1.10.7"
 python-telegram-bot = {git = "https://github.com/python-telegram-bot/python-telegram-bot.git", rev = "master"}
+aiohttp = "^3.8.4"
 
 
 [tool.poetry.group.dev.dependencies]
