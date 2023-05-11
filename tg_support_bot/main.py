@@ -84,9 +84,19 @@ async def forward_to_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger.catch
+async def use_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f'Это не игра, это бот для связи с поддержкой. Пожалуйста, напишите {text}, в игру.'
+    )
+
+
+@logger.catch
 def main() -> None:
     application = Application.builder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(MessageHandler(filters.COMMAND & ~filters.Text(['/start']), use_game))
     application.add_handler(MessageHandler(filters.ChatType.PRIVATE, forward_to_chat))
     application.add_handler(MessageHandler(
         filters.Chat(int(TELEGRAM_SUPPORT_CHAT_ID)) & filters.REPLY,
