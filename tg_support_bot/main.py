@@ -4,10 +4,9 @@ import aiohttp
 from loguru import logger
 from telegram import Update
 from telegram.ext import (Application, CommandHandler, ContextTypes,
-                          ConversationHandler, MessageHandler, filters)
+                          MessageHandler, filters)
 
 from tg_support_bot import schemas
-import json
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '')
 WELCOME_MESSAGE = os.environ.get('WELCOME_MESSAGE', 'Welcome to support chat!')
@@ -18,10 +17,6 @@ CONNECTED_TEXT = os.environ.get('CONNECTED_TEXT', '[*{first_name} {last_name}*](
 
 BOOSTY_CHECKER_URL = os.environ.get('BOOSTY_CHECKER_URL', '')
 BOOSTY_CHECKER_TOKEN = os.environ.get('BOOSTY_CHECKER_TOKEN', '')
-
-TG_IDS_BOOSTY_NAME_ADMINS = json.loads(
-    os.environ.get('TG_IDS_BOOSTY_NAME_ADMINS', '{}')
-)
 
 
 @logger.catch
@@ -101,66 +96,15 @@ async def use_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger.catch
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    await context.bot.send_message(user.id, 'Отмена!')
-    return ConversationHandler.END
-
-
-@logger.catch
-async def token(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    if str(user.id) in TG_IDS_BOOSTY_NAME_ADMINS.keys():
-        await context.bot.send_message(user.id, 'Введите новый токен')
-        return 1
-    else:
-        await context.bot.send_message(user.id, 'У вас нет доступа к этой команде')
-        return ConversationHandler.END
-
-
-@logger.catch
-async def set_token(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    if str(user.id) in TG_IDS_BOOSTY_NAME_ADMINS.keys():
-        new_token = update.message.text
-        auth = aiohttp.BasicAuth('api', BOOSTY_CHECKER_TOKEN)
-        async with aiohttp.ClientSession(auth=auth) as session:
-            data = schemas.SetBoostyToken(
-                name=TG_IDS_BOOSTY_NAME_ADMINS[str(user.id)],
-                token=new_token
-            )
-            async with session.post(f'{BOOSTY_CHECKER_URL}/set_boosty', json=data.dict()) as resp:
-                resp.raise_for_status()
-                await context.bot.send_message(user.id, 'Токен обновлен')
-                return ConversationHandler.END
-    else:
-        await context.bot.send_message(user.id, 'У вас нет доступа к этой команде')
-        return ConversationHandler.END
-
-
-@logger.catch
 def main() -> None:
     application = Application.builder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler('start', start))
-    application.add_handler(MessageHandler(filters.COMMAND & ~filters.Text(['/start', '/token']), use_game))
+    application.add_handler(MessageHandler(filters.COMMAND & ~filters.Text(['/start']), use_game))
     application.add_handler(MessageHandler(filters.ChatType.PRIVATE, forward_to_chat))
     application.add_handler(MessageHandler(
         filters.Chat(int(TELEGRAM_SUPPORT_CHAT_ID)) & filters.REPLY,
         forward_to_user,
     ))
-    set_token_handler = ConversationHandler(
-
-        entry_points=[CommandHandler('token', token, filters.ChatType.PRIVATE)],
-
-        states={
-
-            1: [
-                MessageHandler(filters.ChatType.PRIVATE & filters.TEXT, set_token)
-            ],
-        },
-        fallbacks=[CommandHandler('cancel', cancel)],
-    )
-    application.add_handler(set_token_handler)
     application.run_polling()
 
 
