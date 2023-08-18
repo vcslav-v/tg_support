@@ -9,3 +9,8 @@ class GetPremiumUser(BaseModel):
 
 class IsPremium(BaseModel):
     is_premium: bool
+
+
+class SetBoostyToken(BaseModel):
+    name: str
+    token: str
