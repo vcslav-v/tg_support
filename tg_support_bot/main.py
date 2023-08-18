@@ -148,7 +148,7 @@ def main() -> None:
         filters.Chat(int(TELEGRAM_SUPPORT_CHAT_ID)) & filters.REPLY,
         forward_to_user,
     ))
-    set_token = ConversationHandler(
+    set_token_handler = ConversationHandler(
 
         entry_points=[CommandHandler('token', token, filters.ChatType.PRIVATE)],
 
@@ -160,7 +160,7 @@ def main() -> None:
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
-    application.add_handler(set_token)
+    application.add_handler(set_token_handler)
     application.run_polling()
 
 
